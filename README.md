@@ -1,4 +1,4 @@
-# PyGB
+# PyGB version 0.1
 A simple, easy to use grade book script.
 
 PyGB (short for Python GradeBook) started off as a Python3 script to help me keep track of grades in a freshman-level "Career Exploration" class. As a TA, I did not have access to my university's main gradebook software, so I created PyGB as an excersie in using XML and Python together. After the class ended, I decided to continue with the project in order familiarize myself with GitHub.
