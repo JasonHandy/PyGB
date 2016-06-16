@@ -6,7 +6,7 @@ import EditXML
 import ErrorHandler
 
 
-save_path = os.path.join('/Applications', 'PyGB-0.3', 'Gradebooks')
+save_path = os.path.join('/Applications', 'PyGB-0.3-alpha', 'Gradebooks')
 
 
 def open_file():
