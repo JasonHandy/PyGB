@@ -15,9 +15,9 @@ def export(xmlfile):
     for student in root.findall('student'):
         txtstring += buffer + student.get('name') + buffer
         for assignment in student.findall('assignment'):
-            txtstring += (">" + assignment.find('name').text)
-            poss = float(assignment.find('poss').text)
-            score = float(assignment.find('score').text)
+            txtstring += (">" + assignment.get('name'))
+            poss = float(assignment.get('points_possible'))
+            score = float(assignment.get('score'))
             perc = score / poss * 100
 
             totalposs += poss
@@ -32,8 +32,7 @@ def export(xmlfile):
 
     destination = os.path.join(os.path.expanduser('~'), 'Desktop')
 
-    exportfile = open(destination + '/GRADEBOOK.txt', "w")
-    exportfile.write(txtstring)
-    exportfile.close()
+    with open(destination + '/GRADEBOOK.txt', 'w') as exportfile:
+        exportfile.write(txtstring)
 
     print("Your file has been saved to your desktop!")

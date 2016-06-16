@@ -3,28 +3,28 @@ import xml.etree.ElementTree as xml
 
 def init(filename):
     tree = xml.parse(filename)
-    global ROOT
     ROOT = tree.getroot()
+    global ROOT
 
 
 def get_assignment_average(assignment_name):
     assignment_name = assignment_name.lower()
     totalscore = 0
     amount = 0
-    poss = 0
+    points_possible = 0
     for assignment in ROOT.iter('assignment'):
-        if assignment.find('name').text.lower() == assignment_name:
-            score = float(assignment.find('score').text)
-            poss = float(assignment.find('poss').text)
+        if assignment.get('name').lower() == assignment_name:
+            score = float(assignment.get('score'))
+            points_possible = float(assignment.get('points_possible'))
             totalscore += score
             amount += 1
 
             print("\t>{!s}. {!s} [{!s}%]".format(amount, score,
-                                                 score / poss * 100))
+                                                 score / points_possible * 100))
             print()
 
     average = totalscore / amount
-    percent = (average / poss) * 100
+    percent = (average / points_possible) * 100
     print("The average for {!s} is {!s} [{!s}%]".format(assignment_name,
                                                         average, percent))
 
@@ -48,17 +48,17 @@ def parse_assignment(student):  # Gets, formats, and prints assignment info
     totalscore = 0
 
     for assignment in student.findall('assignment'):
-        name = assignment.find('name').text
-        poss = assignment.find('poss').text
-        score = assignment.find('score').text
-        perc = (float(score) / float(poss)) * 100
+        name = assignment.get('name')
+        points_possible = assignment.get('points_possible')
+        score = assignment.get('score')
+        perc = (float(score) / float(points_possible)) * 100
 
-        totalposs += float(poss)
+        totalposs += float(points_possible)
         totalscore += float(score)
 
         print(">", name)
         output = "{!s} / {!s}    [{!s} %]"
-        print("\t", output.format(score, poss, perc))
+        print("\t", output.format(score, points_possible, perc))
 
     totalperc = (float(totalscore) / float(totalposs)) * 100
     print("> Total")

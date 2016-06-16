@@ -1,0 +1,16 @@
+<data>
+	<student name='Jason'>
+		<assignment name="Homework" points_possible="20" score="17"/>
+		<assignment name="Test" points_possible="100" score="89"/>
+	</student>
+	
+	<student name='Danielle'>
+		<assignment name="Homework" points_possible="20" score="12"/>
+		<assignment name="Test" points_possible="100" score="99"/>
+	</student>
+	
+	<allassign>
+		<name>Homework</name>
+		<name>Test</name>
+	</allassign>
+</data>
