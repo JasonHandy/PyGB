@@ -1,18 +1,35 @@
 import xml.etree.ElementTree as xml
+import os
 
-# TODO (CREATE DISTINCTION BETWEEN ADDING FIRST TIME AND OTHER TIMES)
 
-def initialize_new_file(file_name):
-    with open(file_name):
+def create_new_gradebook(file_name):
+    with open(file_name, 'w+') as file:
         print("Gradebook created!")
 
-    root = xml.Element('Data')
+    root = xml.Element('Gradebook')
     tree = xml.ElementTree(root)
-    xml.SubElement(root, 'allassign')
+    xml.SubElement(root, 'all_assignments')
     tree.write(file_name)
 
 
-def add_students(file_name):
+def delete_gradebook(file_name):
+    os.remove(file_name)
+    print("\nGradebook deleted.")
+
+
+def make_pretty(file_name):
+    from xml.dom import minidom
+
+    with open(file_name, "r") as gradebook:
+        file_string = gradebook.read()
+
+        formatted_string = minidom.parseString(file_string).toprettyxml()
+
+    with open(file_name, "w+") as formatted_gradebook:
+        formatted_gradebook.write(formatted_string)
+
+
+def add_student(file_name):
     tree = xml.parse(file_name)
     root = tree.getroot()
 
@@ -20,68 +37,53 @@ def add_students(file_name):
     xml.SubElement(root, 'student', attrib={'name': student_name})
     tree.write(file_name)
 
-    print("\n[1]Enter another student.")
-    print("\n[2]Enter assignments.")
-    print("\n[3]Main Menu.")
+    print("\nType [quit] to stop entering names and go to the menu.\n")
+    print("\nPress RETURN to continue entering names.")
 
-    choice = input('> ')
+    choice = input("> ")
 
-    if choice == '1':
-        add_students(file_name)
-    elif choice == '2':
-        add_assignments(file_name)
-    elif choice == '3':
+    if choice.lower() == 'quit':
         pass
+    else:
+        add_student(file_name)
 
 
-def add_assignments(file_name):
-    # Add assignments to <allassign> block
+def add_assignment(file_name):
+    # Add assignments to <all_assignments> block
     tree = xml.parse(file_name)
     root = tree.getroot()
 
-    allassign = root.find('allassign')
+    all_assignments = root.find('all_assignments')
     assignment_name = str(input("Enter assignment name: "))
-    points_possible = str(input("How many points is {!s} worth? ".format(
+    points_possible = str(input("How many points is {!s} worth?".format(
         assignment_name)))
 
-    xml.SubElement(allassign, 'name').text = assignment_name
+    xml.SubElement(all_assignments, 'name', attrib={
+        "points_possible":points_possible}).text = assignment_name
     tree.write(file_name)
 
-    # Add assignments to each student block
-    for student in root.iter('student'):
-        xml.SubElement(student, 'assignment', attrib={'name': assignment_name,
-                                                      'points_possible':
-                                                      points_possible})
-        tree.write(file_name)
-
-    print("\n[1]Enter another assignment.")
-    print("\n[2]Enter grades.")
-    print("\n[3]Main Menu.")
-
-    choice = input('> ')
-
-    if choice == '1':
-        add_assignments(file_name)
-    elif choice == '2':
-        add_grades(file_name)
-    elif choice == '3':
-        pass
-
-
-def add_grades(file_name):
+    # Add assignments to <student> blocks
     tree = xml.parse(file_name)
     root = tree.getroot()
 
     for student in root.iter('student'):
         student_name = student.get('name')
+        score = str(input("What did {!s} get on {!s}?".format(student_name,
+                                                              assignment_name)))
 
-        for assignment in student.iter('assignment'):
-            assignment_name = assignment.get('name')
+        xml.SubElement(student, 'assignment', attrib={'name':assignment_name,
+                                                      'points_possible':
+                                                          points_possible,
+                                                      'score': score})
+        tree.write(file_name)
 
-            score = str(input("What did {!s} get on {!s}? ".format(
-                student_name, assignment_name)))
-            assignment.set('score', score)
-            tree.write(file_name)
 
-    pass
+    print("\nType [quit] to stop entering assignments and go to the menu.\n")
+    print("\nPress RETURN to continue entering assignments.")
 
+    choice = input("> ")
+
+    if choice.lower() == 'quit':
+        pass
+    else:
+        add_assignment(file_name)

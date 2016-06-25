@@ -5,8 +5,9 @@ import ParseXML
 import EditXML
 import ErrorHandler
 
-# TODO(SWITCH TO APPLICATIONS DIRECTORY [/Applications])
-save_path = os.path.join('/Volumes', 'HDD', 'PyGB-0.3-alpha', 'Gradebooks')
+# TODO (CREATE PYGB.COMMAND SET TO APPLICATIONS FOLDER)
+# TODO (CREATE FAILSAFES FOR EMPTY/UNFINISHED GRADEBOOKS)
+# TODO (ERROR HANDLING)
 
 
 def open_file():
@@ -14,12 +15,12 @@ def open_file():
 
     gradebook_list = os.listdir(save_path)
     for gradebook in gradebook_list:
-        print('\t>', gradebook.replace('.xml', ''), '\n')
+        if gradebook.__contains__('.xml'):
+            print('\t>', gradebook.replace('.xml', ''), '\n')
         
     FILE_NAME = os.path.join(save_path, str(input("> ")) + '.xml')
 
     if ErrorHandler.is_file_type('xml', FILE_NAME):
-        ParseXML.init(FILE_NAME)
         global FILE_NAME
         main_menu()
     else:
@@ -31,13 +32,8 @@ def new_file():
     gradebook_name = str(input("What would you like to name this gradebook? "))
     FILE_NAME = os.path.join(save_path, gradebook_name + '.xml')
 
-    with open(FILE_NAME, 'w'):
-        print("{!s} gradebook created!".format(FILE_NAME))
-
-    EditXML.initialize_new_file(FILE_NAME)
-    EditXML.add_students(FILE_NAME)
-
-    ParseXML.init(FILE_NAME)
+    EditXML.create_new_gradebook(FILE_NAME)
+    EditXML.add_student(FILE_NAME)
 
     global FILE_NAME
     main_menu()
@@ -48,7 +44,7 @@ def main_menu():
 
     print("Choose an option by typing the number and pressing RETURN")
     print("\t[1] View grades.")
-    print("\t[2] Edit grades.")  # TODO (Create functionality to edit grades)
+    print("\t[2] Edit grades.")
     print("\t[3] File options for {!s}.".format(FILE_NAME))
     print("\t[4] Quit.")
 
@@ -62,6 +58,8 @@ def main_menu():
         file_menu()
     elif choice == '4':
         quit()
+    elif choice == 'pretty':
+        EditXML.make_pretty(FILE_NAME)
     else:
         print("Invalid selection.")
         main_menu()
@@ -80,18 +78,18 @@ def view_menu():
     choice = input("> ")
 
     if choice == '1':
-        ParseXML.print_all_grades()
+        ParseXML.print_all_grades(FILE_NAME)
         input(end_prompt)
         view_menu()
 
     elif choice == '2':
         print("List of students:\n")
-        ParseXML.list_students()
+        ParseXML.list_students(FILE_NAME)
         print("\nEnter the name of a student, then press RETURN.")
         name = input("> \n")
 
         if ErrorHandler.is_a_student(name, FILE_NAME):
-            ParseXML.one_student_grades(name)
+            ParseXML.one_student_grades(FILE_NAME, name)
             input(end_prompt)
             view_menu()
         else:
@@ -112,8 +110,21 @@ def view_menu():
 
 
 def edit_menu():
-    print()
-    # TO DO
+    end_prompt = "Press any key to continue"
+    print("\nYou are using the file {!s}\n".format(FILE_NAME))
+
+    print("Choose an option by typing the number and pressing RETURN")
+    print("\t[1] Add assignments")
+    print("\t[2] Back to main menu.")
+
+    choice = input("> ")
+
+    if choice == '1':
+        EditXML.add_assignment(FILE_NAME)
+        input(end_prompt)
+        edit_menu()
+    elif choice == '2':
+        main_menu()
 
 
 def file_menu():
@@ -124,7 +135,8 @@ def file_menu():
     print("\t[1] Export gradebook to text file.")
     print("\t[2] Open gradebook file.")
     print("\t[3] Create new gradebook")
-    print("\t[4] Back to main menu.")  # TO DO
+    print("\t[4] Delete gradebook")
+    print("\t[5] Back to main menu.")
 
     choice = input("> ")
 
@@ -140,15 +152,28 @@ def file_menu():
         new_file()
 
     elif choice == '4':
+        EditXML.delete_gradebook(FILE_NAME)
+        open_file()
+
+    elif choice == '5':
         main_menu()
 
+if __name__ == '__main__':
 
-print("\n\n\n")
-print("Welcome to SimpleGrade version {!s}!\n".format('0.2'))
-op = input("Would you like to [O]pen an existing file, or create a [N]ew "
-           "one?\n")
+    version_number = '0.4'
 
-if op.lower() == 'o':
-    open_file()
-elif op.lower() == 'n':
-    new_file()
+    save_path = os.path.join(os.path.expanduser('~'), 'Documents',
+                             'PyGB_Gradebooks')
+
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+
+    print("\n\n\n")
+    print("Welcome to PyGB version {!s}!\n".format(version_number))
+    op = input("Would you like to [O]pen an existing file, or create a [N]ew "
+               "one?\n")
+
+    if op.lower() == 'o':
+        open_file()
+    elif op.lower() == 'n':
+        new_file()
