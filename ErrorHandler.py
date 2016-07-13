@@ -1,16 +1,9 @@
 # This module exists to handle possible errors arising from user input.
-import xml.etree.ElementTree as xml
-
-
-def is_file_type(filetype, path):
-    if path.endswith(filetype):
-        return True
-    else:
-        return False
+import xml.etree.ElementTree as Xml
 
 
 def is_a_student(name, path):
-    tree = xml.parse(path)
+    tree = Xml.parse(path)
     root = tree.getroot()
 
     for student in root.iter('student'):
@@ -20,7 +13,7 @@ def is_a_student(name, path):
 
 
 def is_an_assignment(name, path):
-    tree = xml.parse(path)
+    tree = Xml.parse(path)
     root = tree.getroot()
 
     for assignment in root.iter('assignment'):
